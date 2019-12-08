@@ -1,10 +1,19 @@
 package com.shanehonanie.ui.controller;
 
+import com.shanehonanie.service.UserService;
+import com.shanehonanie.shared.dto.UserDto;
+import com.shanehonanie.ui.model.request.UserDetailsRequestModel;
+import com.shanehonanie.ui.model.response.UserRest;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("users") // http://localhost:8080/users
 public class UserController {
+
+    @Autowired
+    UserService userService;
 
     @GetMapping
     public String getUser() {
@@ -12,8 +21,16 @@ public class UserController {
     }
 
     @PostMapping
-    public String createUser() {
-        return "create user was called";
+    public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
+        UserRest returnValue = new UserRest();
+
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(userDetails, userDto);
+
+        UserDto createdUser = userService.createUser(userDto);
+        BeanUtils.copyProperties(createdUser, returnValue);
+
+        return returnValue;
     }
 
     @PutMapping
